@@ -1,0 +1,31 @@
+# manifest.yaml — THIS addon's input declaration (contract clause 10).
+#
+# Every per-install input is tenant- or environment-specific, so NOTHING is
+# bound statically: the consuming fork's matrix entry carries the values via
+# the runner's `contract` input (--contract KEY=JSON), and the addon's
+# variables.tf declares them default-less (no contract values, no valid
+# plan — the entry is the request AND the config). Contract keys:
+#
+#   custom_domains            = ["play.them.com", ...]   (required)
+#   distribution_id           = <platform multi-tenant distribution id>
+#   connection_group_endpoint = dXXXX.cloudfront.net
+#   subdomain_zone_id         = <reservable zone id>
+#   subdomain_zone_name       = cloud.namazustudios.com
+#   connection_group_id       = <optional, platform's connection group>
+#   register_routing          = false (pending the cloud_domains row decision)
+#   source_fqdn               = <tenant's reserved subdomain, when routing on>
+#   cloud_domains_table       = production_cloud_domains (when routing on)
+#
+# The visibility contract: `visibility: shared` makes this addon consumable
+# by any org fork; per-tenant values always ride that fork's entry.
+
+description: >-
+  Full custom DNS: route hostnames the tenant OWNS to their instance through
+  CloudFront SaaS Manager — one distribution tenant + CloudFront-managed ACM
+  certificate per hostname (new domains only), published via the
+  provider-subdomain CNAME pattern so the tenant publishes exactly one CNAME
+  and zero TXT records, with optional cloud_domains routing-row mirroring
+  (strategy B, host header forwarded end to end). Two-step activation:
+  apply #1 never blocks on the tenant's DNS; the next apply reports Deployed.
+visibility: shared
+display: Custom DNS
